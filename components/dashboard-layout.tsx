@@ -24,57 +24,82 @@ interface SidebarProps {
   className?: string;
 }
 
-const navigation = [
+const navigationPhases = [
   {
     name: 'Dashboard',
-    href: '/',
-    icon: LayoutDashboard,
+    items: [
+      {
+        name: 'Overview',
+        href: '/',
+        icon: LayoutDashboard,
+      }
+    ]
   },
   {
-    name: 'Fakultas & Prodi',
-    href: '/fakultas',
-    icon: GraduationCap,
+    name: 'Setup Institusi',
+    items: [
+      {
+        name: 'Fakultas & Prodi',
+        href: '/fakultas',
+        icon: GraduationCap,
+      },
+      {
+        name: 'Profil Lulusan',
+        href: '/profil-lulusan',
+        icon: Target,
+      }
+    ]
   },
   {
-    name: 'Profil Lulusan',
-    href: '/profil-lulusan',
-    icon: Target,
+    name: 'Desain Kurikulum',
+    items: [
+      {
+        name: 'CPL',
+        href: '/cpl',
+        icon: BookOpen,
+      },
+      {
+        name: 'Mata Kuliah',
+        href: '/mata-kuliah',
+        icon: FileText,
+      },
+      {
+        name: 'CPMK',
+        href: '/cpmk',
+        icon: Target,
+      }
+    ]
   },
   {
-    name: 'CPL',
-    href: '/cpl',
-    icon: BookOpen,
+    name: 'Pemetaan',
+    items: [
+      {
+        name: 'Mapping CPMK-CPL',
+        href: '/mapping',
+        icon: BarChart3,
+      }
+    ]
   },
   {
-    name: 'Mata Kuliah',
-    href: '/mata-kuliah',
-    icon: FileText,
-  },
-  {
-    name: 'CPMK',
-    href: '/cpmk',
-    icon: Target,
-  },
-  {
-    name: 'Mapping CPMK-CPL',
-    href: '/mapping',
-    icon: BarChart3,
-  },
-  {
-    name: 'Stakeholder',
-    href: '/stakeholder',
-    icon: Users,
-  },
-  {
-    name: 'Survey',
-    href: '/survey',
-    icon: FileText,
-  },
-  {
-    name: 'Analytics',
-    href: '/analytics',
-    icon: BarChart3,
-  },
+    name: 'Evaluasi',
+    items: [
+      {
+        name: 'Stakeholder',
+        href: '/stakeholder',
+        icon: Users,
+      },
+      {
+        name: 'Survey',
+        href: '/survey',
+        icon: FileText,
+      },
+      {
+        name: 'Analytics',
+        href: '/analytics',
+        icon: BarChart3,
+      }
+    ]
+  }
 ];
 
 export function Sidebar({ className }: SidebarProps) {
@@ -101,25 +126,38 @@ export function Sidebar({ className }: SidebarProps) {
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-2 space-y-1">
-          {navigation.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link key={item.name} href={item.href}>
-                <Button
-                  variant={isActive ? 'secondary' : 'ghost'}
-                  className={cn(
-                    'w-full justify-start',
-                    collapsed && 'px-2'
-                  )}
-                  title={collapsed ? item.name : undefined}
-                >
-                  <item.icon className="h-4 w-4 mr-2" />
-                  {!collapsed && item.name}
-                </Button>
-              </Link>
-            );
-          })}
+        <div className="p-2 space-y-3">
+          {navigationPhases.map((phase, phaseIndex) => (
+            <div key={phase.name}>
+              {!collapsed && phaseIndex > 0 && (
+                <div className="px-2 py-1 mb-2">
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    {phase.name}
+                  </h3>
+                </div>
+              )}
+              <div className="space-y-1">
+                {phase.items.map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <Link key={item.name} href={item.href}>
+                      <Button
+                        variant={isActive ? 'secondary' : 'ghost'}
+                        className={cn(
+                          'w-full justify-start',
+                          collapsed && 'px-2'
+                        )}
+                        title={collapsed ? item.name : undefined}
+                      >
+                        <item.icon className="h-4 w-4 mr-2" />
+                        {!collapsed && item.name}
+                      </Button>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </ScrollArea>
 
