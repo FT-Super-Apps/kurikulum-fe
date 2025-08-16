@@ -204,11 +204,10 @@ export const GET_ALL_CPMK = gql`
       id
       kode
       deskripsi
-      level
-      mataKuliah {
-        kode
-        nama
-      }
+      bloom_level
+      mata_kuliah_id
+      created_at
+      updated_at
     }
   }
 `;
@@ -218,7 +217,7 @@ export const FIND_CPMK_BY_ID = gql`
     findCpmkById(id: $id) {
       kode
       deskripsi
-      level
+      bloom_level
     }
   }
 `;
@@ -228,7 +227,7 @@ export const FIND_CPMK_BY_MATA_KULIAH = gql`
     findCpmkByMataKuliah(mata_kuliah_id: $mata_kuliah_id) {
       kode
       deskripsi
-      level
+      bloom_level
     }
   }
 `;

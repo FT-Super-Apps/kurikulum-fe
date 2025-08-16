@@ -103,7 +103,7 @@ export interface CPMK {
   id: string;
   kode: string;
   deskripsi: string;
-  level: BloomLevel;
+  bloom_level: BloomLevel;
   mata_kuliah_id: string;
   created_at: string;
   updated_at: string;
@@ -206,13 +206,13 @@ export interface UpdateMataKuliahInput {
 export interface CreateCpmkInput {
   kode: string;
   deskripsi: string;
-  level: BloomLevel;
+  bloom_level: BloomLevel;
   mata_kuliah_id: string;
 }
 
 export interface UpdateCpmkInput {
   deskripsi?: string;
-  level?: BloomLevel;
+  bloom_level?: BloomLevel;
 }
 
 export interface CreateCpmkCplInput {

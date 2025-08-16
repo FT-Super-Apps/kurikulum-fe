@@ -15,17 +15,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { GET_ALL_CPMK, GET_ALL_MATA_KULIAH } from '@/lib/graphql/queries';
 import { CREATE_CPMK, UPDATE_CPMK, REMOVE_CPMK } from '@/lib/graphql/mutations';
-import { CPMK, MataKuliah, BloomLevel, CreateCpmkInput, UpdateCpmkInput } from '@/lib/types';
-import { Target, Plus, Edit, Trash2, BookOpen, Brain } from 'lucide-react';
+import { CPMK, MataKuliah, CreateCpmkInput, UpdateCpmkInput, BloomLevel } from '@/lib/types';
+import { Target, Plus, Edit, Trash2, BookOpen } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-
-interface CpmkData {
-  cpmk: CPMK[];
-}
-
-interface MataKuliahData {
-  mataKuliah: MataKuliah[];
-}
 
 const bloomLevelOptions = [
   { value: BloomLevel.MENGINGAT, label: 'Mengingat', color: 'bg-blue-100 text-blue-800' },
@@ -38,6 +30,14 @@ const bloomLevelOptions = [
 
 function getBloomLevelColor(level: BloomLevel) {
   return bloomLevelOptions.find(option => option.value === level)?.color || 'bg-gray-100 text-gray-800';
+}
+
+interface CpmkData {
+  cpmk: CPMK[];
+}
+
+interface MataKuliahData {
+  mataKuliah: MataKuliah[];
 }
 
 function CreateCpmkDialog({ onSuccess }: { onSuccess: () => void }) {
@@ -196,7 +196,7 @@ function EditCpmkDialog({ cpmk, onSuccess }: { cpmk: CPMK; onSuccess: () => void
             </div>
             <div className="grid gap-2">
               <Label htmlFor="level">Level Bloom</Label>
-              <Select onValueChange={(value) => setValue('level', value as BloomLevel)} defaultValue={cpmk.level}>
+              <Select onValueChange={(value) => setValue('level', value as BloomLevel)} defaultValue={cpmk.level || undefined}>
                 <SelectTrigger>
                   <SelectValue placeholder="Pilih level Bloom" />
                 </SelectTrigger>
@@ -229,6 +229,7 @@ function EditCpmkDialog({ cpmk, onSuccess }: { cpmk: CPMK; onSuccess: () => void
 
 function CpmkList() {
   const { data, loading, error, refetch } = useQuery<CpmkData>(GET_ALL_CPMK);
+  const { data: mataKuliahData } = useQuery<MataKuliahData>(GET_ALL_MATA_KULIAH);
   const [removeCpmk] = useMutation(REMOVE_CPMK, {
     refetchQueries: [GET_ALL_CPMK],
   });
@@ -267,12 +268,13 @@ function CpmkList() {
     );
   }
 
-  // Group CPMK by mata kuliah
+  // Group CPMK by mata kuliah ID and join with mata kuliah data
   const groupedCpmk = data?.cpmk.reduce((acc, cpmk) => {
-    const mkKey = cpmk.mataKuliah?.id || 'unknown';
+    const mkKey = cpmk.mata_kuliah_id || 'unknown';
     if (!acc[mkKey]) {
+      const mataKuliah = mataKuliahData?.mataKuliah.find(mk => mk.id === cpmk.mata_kuliah_id);
       acc[mkKey] = {
-        mataKuliah: cpmk.mataKuliah,
+        mataKuliah: mataKuliah,
         cpmkList: [],
       };
     }
@@ -287,7 +289,7 @@ function CpmkList() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
-              {group.mataKuliah?.kode} - {group.mataKuliah?.nama}
+              {group.mataKuliah?.kode || 'Unknown'} - {group.mataKuliah?.nama || 'Mata Kuliah Tidak Ditemukan'}
             </CardTitle>
             <CardDescription>
               {group.cpmkList.length} CPMK terdefinisi
@@ -302,10 +304,11 @@ function CpmkList() {
                       <div className="flex items-center gap-2 mb-2">
                         <Target className="h-4 w-4" />
                         <span className="font-medium">{cpmk.kode}</span>
-                        <Badge className={getBloomLevelColor(cpmk.level)}>
-                          <Brain className="h-3 w-3 mr-1" />
-                          {bloomLevelOptions.find(opt => opt.value === cpmk.level)?.label}
-                        </Badge>
+                        {cpmk.level && (
+                          <Badge className={getBloomLevelColor(cpmk.level)}>
+                            {bloomLevelOptions.find(opt => opt.value === cpmk.level)?.label}
+                          </Badge>
+                        )}
                       </div>
                       <p className="text-sm text-muted-foreground">{cpmk.deskripsi}</p>
                     </div>
@@ -356,16 +359,6 @@ export default function CpmkPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="mb-4">
-                <div className="flex flex-wrap gap-2">
-                  <span className="text-sm font-medium">Level Bloom:</span>
-                  {bloomLevelOptions.map((option) => (
-                    <Badge key={option.value} className={option.color}>
-                      {option.label}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
               <CpmkList />
             </CardContent>
           </Card>

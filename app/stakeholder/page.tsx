@@ -19,7 +19,7 @@ import { Users, Plus, Edit, Trash2, Building, Mail } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 interface StakeholderData {
-  stakeholder: Stakeholder[];
+  stakeholders: Stakeholder[];
 }
 
 const stakeholderTypeOptions = [
@@ -265,7 +265,7 @@ function StakeholderList() {
   }
 
   // Group stakeholders by type
-  const groupedStakeholders = data?.stakeholder.reduce((acc, stakeholder) => {
+  const groupedStakeholders = data?.stakeholders?.reduce((acc, stakeholder) => {
     if (!acc[stakeholder.tipe]) {
       acc[stakeholder.tipe] = [];
     }
