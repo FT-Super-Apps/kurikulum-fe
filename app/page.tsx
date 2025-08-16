@@ -2,6 +2,8 @@
 
 import { useQuery } from '@apollo/client';
 import { DashboardLayout } from '@/components/dashboard-layout';
+import { WorkflowProgress } from '@/components/workflow-progress';
+import { QuickActions } from '@/components/quick-actions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -134,65 +136,6 @@ function RecentActivities({ isConnected, error }: { isConnected: boolean; error?
   );
 }
 
-function QuickActions() {
-  const actions = [
-    {
-      title: 'Lihat Fakultas',
-      description: 'Browse data fakultas',
-      href: '/fakultas',
-      icon: Building,
-      color: 'bg-blue-500'
-    },
-    {
-      title: 'Kelola CPL',
-      description: 'Capaian pembelajaran lulusan',
-      href: '/cpl',
-      icon: Target,
-      color: 'bg-green-500'
-    },
-    {
-      title: 'Mata Kuliah',
-      description: 'Daftar mata kuliah',
-      href: '/mata-kuliah',
-      icon: BookOpen,
-      color: 'bg-purple-500'
-    },
-    {
-      title: 'Analytics',
-      description: 'Dashboard & laporan',
-      href: '/analytics',
-      icon: TrendingUp,
-      color: 'bg-orange-500'
-    }
-  ];
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Navigasi Cepat</CardTitle>
-        <CardDescription>
-          Akses halaman utama aplikasi
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="grid gap-3">
-        {actions.map((action) => (
-          <Link key={action.href} href={action.href}>
-            <div className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent transition-colors cursor-pointer">
-              <div className={`p-2 rounded-md ${action.color}`}>
-                <action.icon className="h-4 w-4 text-white" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">{action.title}</p>
-                <p className="text-xs text-muted-foreground">{action.description}</p>
-              </div>
-              <ArrowRight className="h-4 w-4 text-muted-foreground" />
-            </div>
-          </Link>
-        ))}
-      </CardContent>
-    </Card>
-  );
-}
 
 export default function Dashboard() {
   const { data, loading, error } = useQuery(GET_ALL_FAKULTAS);
@@ -219,6 +162,8 @@ export default function Dashboard() {
             Sistem Manajemen Kurikulum Program Studi Informatika
           </p>
         </div>
+
+        <WorkflowProgress />
 
         <ConnectionStatus isConnected={!!isConnected} error={error} />
 
@@ -273,9 +218,9 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <RecentActivities isConnected={!!isConnected} error={error} />
+        <div className="grid gap-6 lg:grid-cols-2">
           <QuickActions />
+          <RecentActivities isConnected={!!isConnected} error={error} />
         </div>
       </div>
     </DashboardLayout>
