@@ -20,7 +20,7 @@ import { Target, Plus, Edit, Trash2, Building } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 interface CplData {
-  cpls: CPL[];
+  cpl: CPL[];
 }
 
 interface ProdiData {
@@ -256,7 +256,7 @@ function CplList() {
 
   return (
     <div className="space-y-4">
-      {data?.cpls?.map((cpl: any) => (
+      {data?.cpl?.map((cpl: any) => (
         <Card key={cpl.id}>
           <CardHeader>
             <div className="flex items-center justify-between">

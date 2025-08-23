@@ -3,6 +3,7 @@
 import { ApolloProvider } from '@apollo/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { apolloClient } from '@/lib/apollo-client';
+import { ProdiProvider } from '@/contexts/prodi-context';
 import { useState } from 'react';
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -18,7 +19,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <ApolloProvider client={apolloClient}>
-        {children}
+        <ProdiProvider>
+          {children}
+        </ProdiProvider>
       </ApolloProvider>
     </QueryClientProvider>
   );

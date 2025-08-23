@@ -10,8 +10,7 @@ import { GET_ALL_FAKULTAS } from '@/lib/graphql/queries';
 import { GraduationCap, Building, Users, CheckCircle } from 'lucide-react';
 
 interface FakultasData {
-  allFakultas: Array<{
-    id: string;
+  fakultas: Array<{
     kode: string;
     nama: string;
     alias: string;
@@ -71,8 +70,8 @@ function FakultasList() {
 
   return (
     <div className="space-y-4">
-      {data?.allFakultas?.map((fakultas) => (
-        <Card key={fakultas.id}>
+      {data?.fakultas?.map((fakultas, index) => (
+        <Card key={`${fakultas.kode}-${index}`}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Building className="h-5 w-5" />
@@ -97,7 +96,7 @@ function FakultasList() {
         </Card>
       ))}
 
-      {(!data?.allFakultas || data.allFakultas.length === 0) && (
+      {(!data?.fakultas || data.fakultas.length === 0) && (
         <Card>
           <CardContent className="text-center py-12">
             <Building className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />

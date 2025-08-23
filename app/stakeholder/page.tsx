@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -15,18 +16,18 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { GET_ALL_STAKEHOLDER } from '@/lib/graphql/queries';
 import { CREATE_STAKEHOLDER, UPDATE_STAKEHOLDER, REMOVE_STAKEHOLDER } from '@/lib/graphql/mutations';
 import { Stakeholder, StakeholderType, CreateStakeholderInput, UpdateStakeholderInput } from '@/lib/types';
-import { Users, Plus, Edit, Trash2, Building, Mail } from 'lucide-react';
+import { Users, Plus, Edit, Trash2, Building, Phone, Mail, UserCheck } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 interface StakeholderData {
-  stakeholders: Stakeholder[];
+  stakeholder: Stakeholder[];
 }
 
 const stakeholderTypeOptions = [
   { value: StakeholderType.PENGGUNA_LULUSAN, label: 'Pengguna Lulusan', color: 'bg-blue-100 text-blue-800' },
   { value: StakeholderType.ALUMNI, label: 'Alumni', color: 'bg-green-100 text-green-800' },
-  { value: StakeholderType.INDUSTRI, label: 'Industri', color: 'bg-orange-100 text-orange-800' },
-  { value: StakeholderType.ASOSIASI, label: 'Asosiasi', color: 'bg-purple-100 text-purple-800' },
+  { value: StakeholderType.INDUSTRI, label: 'Industri', color: 'bg-purple-100 text-purple-800' },
+  { value: StakeholderType.ASOSIASI, label: 'Asosiasi', color: 'bg-orange-100 text-orange-800' },
 ];
 
 function getStakeholderTypeColor(type: StakeholderType) {
@@ -67,12 +68,12 @@ function CreateStakeholderDialog({ onSuccess }: { onSuccess: () => void }) {
           <DialogHeader>
             <DialogTitle>Tambah Stakeholder Baru</DialogTitle>
             <DialogDescription>
-              Tambahkan stakeholder baru ke sistem
+              Tambahkan stakeholder yang berpartisipasi dalam evaluasi kurikulum
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="nama">Nama</Label>
+              <Label htmlFor="nama">Nama Stakeholder</Label>
               <Input
                 id="nama"
                 placeholder="PT Tech Innovate"
@@ -88,7 +89,10 @@ function CreateStakeholderDialog({ onSuccess }: { onSuccess: () => void }) {
                 <SelectContent>
                   {stakeholderTypeOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
-                      {option.label}
+                      <div className="flex items-center gap-2">
+                        <div className={`w-3 h-3 rounded-full ${option.color}`}></div>
+                        {option.label}
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -171,7 +175,7 @@ function EditStakeholderDialog({ stakeholder, onSuccess }: { stakeholder: Stakeh
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="nama">Nama</Label>
+              <Label htmlFor="nama">Nama Stakeholder</Label>
               <Input
                 id="nama"
                 placeholder="PT Tech Innovate"
@@ -187,7 +191,10 @@ function EditStakeholderDialog({ stakeholder, onSuccess }: { stakeholder: Stakeh
                 <SelectContent>
                   {stakeholderTypeOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
-                      {option.label}
+                      <div className="flex items-center gap-2">
+                        <div className={`w-3 h-3 rounded-full ${option.color}`}></div>
+                        {option.label}
+                      </div>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -264,12 +271,13 @@ function StakeholderList() {
     );
   }
 
-  // Group stakeholders by type
-  const groupedStakeholders = data?.stakeholders?.reduce((acc, stakeholder) => {
-    if (!acc[stakeholder.tipe]) {
-      acc[stakeholder.tipe] = [];
+  // Group by type
+  const groupedStakeholders = data?.stakeholder.reduce((acc, stakeholder) => {
+    const typeKey = stakeholder.tipe;
+    if (!acc[typeKey]) {
+      acc[typeKey] = [];
     }
-    acc[stakeholder.tipe].push(stakeholder);
+    acc[typeKey].push(stakeholder);
     return acc;
   }, {} as Record<StakeholderType, Stakeholder[]>);
 
@@ -281,10 +289,12 @@ function StakeholderList() {
           <Card key={type}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                {typeOption?.label}
-                <Badge className={typeOption?.color}>{stakeholders.length}</Badge>
+                <UserCheck className="h-5 w-5" />
+                {typeOption?.label || type}
               </CardTitle>
+              <CardDescription>
+                {stakeholders.length} stakeholder terdaftar
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -293,8 +303,11 @@ function StakeholderList() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <Building className="h-4 w-4 text-blue-600" />
+                          <Users className="h-4 w-4" />
                           <span className="font-medium">{stakeholder.nama}</span>
+                          <Badge className={getStakeholderTypeColor(stakeholder.tipe)}>
+                            {stakeholderTypeOptions.find(opt => opt.value === stakeholder.tipe)?.label}
+                          </Badge>
                         </div>
                         <div className="space-y-1 text-sm text-muted-foreground">
                           <div className="flex items-center gap-2">
@@ -326,6 +339,18 @@ function StakeholderList() {
           </Card>
         );
       })}
+
+      {(!data?.stakeholder || data.stakeholder.length === 0) && (
+        <Card>
+          <CardContent className="text-center py-12">
+            <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+            <h3 className="text-lg font-medium mb-2">Belum ada stakeholder</h3>
+            <p className="text-muted-foreground">
+              Stakeholder akan muncul di sini ketika sudah ditambahkan
+            </p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
@@ -340,35 +365,23 @@ export default function StakeholderPage() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Stakeholder</h1>
             <p className="text-muted-foreground">
-              Manajemen data stakeholder untuk evaluasi kurikulum
+              Manajemen stakeholder yang berpartisipasi dalam evaluasi kurikulum
             </p>
           </div>
           <CreateStakeholderDialog onSuccess={() => refetch()} />
         </div>
 
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Daftar Stakeholder</CardTitle>
-              <CardDescription>
-                Stakeholder yang terdaftar di sistem, dikelompokkan berdasarkan tipe
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-4">
-                <div className="flex flex-wrap gap-2">
-                  <span className="text-sm font-medium">Tipe Stakeholder:</span>
-                  {stakeholderTypeOptions.map((option) => (
-                    <Badge key={option.value} className={option.color}>
-                      {option.label}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-              <StakeholderList />
-            </CardContent>
-          </Card>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Daftar Stakeholder</CardTitle>
+            <CardDescription>
+              Stakeholder yang terdaftar, dikelompokkan berdasarkan tipe
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <StakeholderList />
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   );

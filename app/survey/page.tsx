@@ -21,15 +21,15 @@ import { FileText, Plus, Edit, Trash2, Calendar, Users, BarChart3, MessageCircle
 import { useForm } from 'react-hook-form';
 
 interface SurveyData {
-  surveys: Survey[];
+  survey: Survey[];
 }
 
 interface SurveyQuestionData {
-  surveyQuestions: SurveyQuestion[];
+  surveyQuestion: SurveyQuestion[];
 }
 
 interface SurveyResponseData {
-  surveyResponses: SurveyResponse[];
+  surveyResponse: SurveyResponse[];
 }
 
 interface ProdiData {
@@ -283,7 +283,7 @@ function SurveyList() {
 
   return (
     <div className="space-y-4">
-      {data?.surveys.map((survey) => (
+      {data?.survey.map((survey) => (
         <Card key={survey.id}>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -362,7 +362,7 @@ function SurveyQuestionList() {
   }
 
   // Group questions by survey
-  const groupedQuestions = data?.surveyQuestions.reduce((acc, question) => {
+  const groupedQuestions = data?.surveyQuestion.reduce((acc, question) => {
     const surveyId = question.survey?.id || 'unknown';
     if (!acc[surveyId]) {
       acc[surveyId] = {
@@ -443,7 +443,7 @@ function SurveyResponseList() {
 
   return (
     <div className="space-y-4">
-      {data?.surveyResponses.map((response) => (
+      {data?.surveyResponse.map((response) => (
         <Card key={response.id}>
           <CardHeader>
             <div className="flex items-center justify-between">

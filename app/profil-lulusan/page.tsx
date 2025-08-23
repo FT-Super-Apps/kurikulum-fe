@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { DashboardLayout } from '@/components/dashboard-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -15,7 +16,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { GET_ALL_PROFIL_LULUSAN, GET_ALL_PRODI } from '@/lib/graphql/queries';
 import { CREATE_PROFIL_LULUSAN, UPDATE_PROFIL_LULUSAN, REMOVE_PROFIL_LULUSAN } from '@/lib/graphql/mutations';
 import { ProfilLulusan, Prodi, CreateProfilLulusanInput, UpdateProfilLulusanInput } from '@/lib/types';
-import { Target, Plus, Edit, Trash2, Building, User } from 'lucide-react';
+import { Target, Plus, Edit, Trash2, Building, Users } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 interface ProfilLulusanData {
@@ -61,7 +62,7 @@ function CreateProfilLulusanDialog({ onSuccess }: { onSuccess: () => void }) {
           <DialogHeader>
             <DialogTitle>Tambah Profil Lulusan Baru</DialogTitle>
             <DialogDescription>
-              Tambahkan profil lulusan baru untuk program studi
+              Tambahkan profil lulusan dan jalur karir baru
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -78,7 +79,6 @@ function CreateProfilLulusanDialog({ onSuccess }: { onSuccess: () => void }) {
               <Textarea
                 id="deskripsi"
                 placeholder="Profesional yang mampu merancang dan mengembangkan perangkat lunak..."
-                rows={4}
                 {...register('deskripsi', { required: true })}
               />
             </div>
@@ -91,7 +91,7 @@ function CreateProfilLulusanDialog({ onSuccess }: { onSuccess: () => void }) {
                 <SelectContent>
                   {prodiData?.prodi.map((prodi) => (
                     <SelectItem key={prodi.id} value={prodi.id}>
-                      {prodi.nama} - {prodi.fakultas?.nama}
+                      {prodi.nama}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -114,7 +114,7 @@ function CreateProfilLulusanDialog({ onSuccess }: { onSuccess: () => void }) {
 
 function EditProfilLulusanDialog({ profilLulusan, onSuccess }: { profilLulusan: ProfilLulusan; onSuccess: () => void }) {
   const [open, setOpen] = useState(false);
-  const { register, handleSubmit, reset } = useForm<UpdateProfilLulusanInput>({
+  const { register, handleSubmit, setValue, reset } = useForm<UpdateProfilLulusanInput>({
     defaultValues: {
       id: profilLulusan.id,
       nama: profilLulusan.nama,
@@ -168,7 +168,6 @@ function EditProfilLulusanDialog({ profilLulusan, onSuccess }: { profilLulusan: 
               <Textarea
                 id="deskripsi"
                 placeholder="Profesional yang mampu merancang dan mengembangkan perangkat lunak..."
-                rows={4}
                 {...register('deskripsi')}
               />
             </div>
@@ -210,7 +209,6 @@ function ProfilLulusanList() {
             </CardHeader>
             <CardContent>
               <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-3/4 mt-2" />
             </CardContent>
           </Card>
         ))}
@@ -228,9 +226,9 @@ function ProfilLulusanList() {
     );
   }
 
-  // Group by program studi
-  const groupedProfiles = data?.allProfilLulusan.reduce((acc, profil) => {
-    const prodiKey = profil.prodi?.id || 'unknown';
+  // Group by prodi
+  const groupedProfilLulusan = data?.allProfilLulusan.reduce((acc, profil) => {
+    const prodiKey = profil.prodi?.nama || 'Unknown';
     if (!acc[prodiKey]) {
       acc[prodiKey] = {
         prodi: profil.prodi,
@@ -243,30 +241,31 @@ function ProfilLulusanList() {
 
   return (
     <div className="space-y-6">
-      {Object.entries(groupedProfiles || {}).map(([prodiId, group]) => (
-        <Card key={prodiId}>
+      {Object.entries(groupedProfilLulusan || {}).map(([prodiName, group]) => (
+        <Card key={prodiName}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Building className="h-5 w-5" />
-              {group.prodi?.nama}
+              {prodiName}
             </CardTitle>
             <CardDescription>
-              {group.prodi?.fakultas?.nama} - {group.profiles.length} profil lulusan
+              {group.profiles.length} profil lulusan terdefinisi
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3">
               {group.profiles.map((profil) => (
                 <div key={profil.id} className="border rounded-lg p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-3">
-                        <User className="h-5 w-5 text-blue-600" />
-                        <h3 className="font-semibold text-lg">{profil.nama}</h3>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Users className="h-4 w-4" />
+                        <span className="font-medium">{profil.nama}</span>
+                        <Badge variant="secondary">
+                          {group.prodi?.fakultas?.nama || 'Unknown'}
+                        </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {profil.deskripsi}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{profil.deskripsi}</p>
                     </div>
                     <div className="flex items-center gap-2 ml-4">
                       <EditProfilLulusanDialog profilLulusan={profil} onSuccess={() => refetch()} />
@@ -290,10 +289,10 @@ function ProfilLulusanList() {
       {(!data?.allProfilLulusan || data.allProfilLulusan.length === 0) && (
         <Card>
           <CardContent className="text-center py-12">
-            <Target className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+            <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
             <h3 className="text-lg font-medium mb-2">Belum ada profil lulusan</h3>
-            <p className="text-muted-foreground mb-4">
-              Tambahkan profil lulusan untuk mendefinisikan jalur karir lulusan program studi
+            <p className="text-muted-foreground">
+              Profil lulusan akan muncul di sini ketika sudah ditambahkan
             </p>
           </CardContent>
         </Card>
@@ -312,7 +311,7 @@ export default function ProfilLulusanPage() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Profil Lulusan</h1>
             <p className="text-muted-foreground">
-              Manajemen profil lulusan dan jalur karir untuk program studi
+              Manajemen profil lulusan dan jalur karir
             </p>
           </div>
           <CreateProfilLulusanDialog onSuccess={() => refetch()} />
@@ -322,7 +321,7 @@ export default function ProfilLulusanPage() {
           <CardHeader>
             <CardTitle>Daftar Profil Lulusan</CardTitle>
             <CardDescription>
-              Profil lulusan yang terdefinisi untuk setiap program studi
+              Profil lulusan yang terdefinisi, dikelompokkan berdasarkan program studi
             </CardDescription>
           </CardHeader>
           <CardContent>

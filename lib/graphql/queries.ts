@@ -3,8 +3,7 @@ import { gql } from '@apollo/client';
 // Fakultas Queries
 export const GET_ALL_FAKULTAS = gql`
   query AllFakultas {
-    allFakultas {
-      id
+    fakultas {
       kode
       nama
       alias
@@ -96,12 +95,18 @@ export const GET_PROFIL_LULUSAN = gql`
 
 // CPL Queries
 export const GET_ALL_CPL = gql`
-  query AllCpls {
-    cpls {
+  query AllCpl {
+    cpl {
       id
       kode
       deskripsi
       domain
+      prodi {
+        nama
+        fakultas {
+          nama
+        }
+      }
     }
   }
 `;
@@ -204,10 +209,11 @@ export const GET_ALL_CPMK = gql`
       id
       kode
       deskripsi
-      bloom_level
-      mata_kuliah_id
-      created_at
-      updated_at
+      level
+      mataKuliah {
+        kode
+        nama
+      }
     }
   }
 `;
@@ -217,7 +223,7 @@ export const FIND_CPMK_BY_ID = gql`
     findCpmkById(id: $id) {
       kode
       deskripsi
-      bloom_level
+      level
     }
   }
 `;
@@ -227,7 +233,7 @@ export const FIND_CPMK_BY_MATA_KULIAH = gql`
     findCpmkByMataKuliah(mata_kuliah_id: $mata_kuliah_id) {
       kode
       deskripsi
-      bloom_level
+      level
     }
   }
 `;
@@ -307,7 +313,7 @@ export const FIND_CPMK_CPL_BY_CPL = gql`
 // Stakeholder Queries
 export const GET_ALL_STAKEHOLDER = gql`
   query AllStakeholders {
-    stakeholders {
+    stakeholder {
       id
       nama
       tipe
@@ -340,7 +346,7 @@ export const FIND_STAKEHOLDER_BY_TIPE = gql`
 // Survey Queries
 export const GET_ALL_SURVEY = gql`
   query AllSurveys {
-    surveys {
+    survey {
       id
       judul
       metode
@@ -390,7 +396,7 @@ export const FIND_SURVEY_BY_METODE = gql`
 // Survey Question Queries
 export const GET_ALL_SURVEY_QUESTION = gql`
   query AllSurveyQuestions {
-    surveyQuestions {
+    surveyQuestion {
       id
       nomor
       pertanyaan
@@ -435,7 +441,7 @@ export const FIND_QUESTIONS_BY_TIPE = gql`
 // Survey Response Queries
 export const GET_ALL_SURVEY_RESPONSE = gql`
   query AllSurveyResponses {
-    surveyResponses {
+    surveyResponse {
       id
       ringkasan
       weight

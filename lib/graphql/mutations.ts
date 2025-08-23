@@ -90,7 +90,7 @@ export const CREATE_CPMK = gql`
       id
       kode
       deskripsi
-      bloom_level
+      level
     }
   }
 `;
@@ -100,7 +100,7 @@ export const UPDATE_CPMK = gql`
     updateCpmk(id: $id, updateCpmkInput: $updateCpmkInput) {
       id
       deskripsi
-      bloom_level
+      level
     }
   }
 `;

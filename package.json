@@ -6,7 +6,16 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "node test-runner.js --safe",
+    "test:all": "node test-runner.js --mutations-enabled --all",
+    "test:queries": "node test-runner.js --queries",
+    "test:schema": "node test-runner.js --schema",
+    "test:mutations": "node test-runner.js --mutations-enabled --mutations",
+    "test:performance": "node test-runner.js --performance",
+    "test:graphql": "node test-graphql-comprehensive.js",
+    "test:apollo": "node test-apollo-client.js",
+    "demo": "node demo-tests.js"
   },
   "dependencies": {
     "@apollo/client": "^3.13.9",
@@ -65,6 +74,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "node-fetch": "^2.7.0",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.6",
     "typescript": "^5"
