@@ -89,9 +89,9 @@ function OverviewTab() {
   const stats: OverviewStats = {
     fakultas: fakultasData?.fakultas?.length || 0,
     prodi: fakultasData?.fakultas?.reduce((acc: number, f: any) => acc + (f.prodi?.length || 0), 0) || 0,
-    cpl: cplData?.allCpl?.length || 0,
-    mataKuliah: mataKuliahData?.allMataKuliah?.length || 0,
-    cpmk: cpmkData?.allCpmk?.length || 0,
+    cpl: cplData?.cpl?.length || 0,
+    mataKuliah: mataKuliahData?.mataKuliah?.length || 0,
+    cpmk: cpmkData?.cpmk?.length || 0,
     profilLulusan: profilLulusanData?.allProfilLulusan?.length || 0,
     stakeholder: stakeholderData?.stakeholder?.length || 0,
     survey: surveyData?.survey?.length || 0,
@@ -231,7 +231,7 @@ function CurriculumAnalysis() {
   const { data: cpmkData } = useQuery(GET_ALL_CPMK);
 
   // Group CPL by sikap, pengetahuan, keterampilan umum, keterampilan khusus
-  const cplByType = cplData?.allCpl?.reduce((acc: any, cpl: any) => {
+  const cplByType = cplData?.cpl?.reduce((acc: any, cpl: any) => {
     let type = 'Lainnya';
     if (cpl.kode?.toLowerCase().includes('s')) type = 'Sikap';
     else if (cpl.kode?.toLowerCase().includes('p')) type = 'Pengetahuan';
@@ -325,7 +325,7 @@ function CurriculumAnalysis() {
           <div className="grid gap-4 md:grid-cols-3">
             <div className="text-center">
               <div className="text-3xl font-bold text-blue-600">
-                {cplData?.allCpl?.length || 0}
+                {cplData?.cpl?.length || 0}
               </div>
               <div className="text-sm text-muted-foreground">Total CPL</div>
             </div>
