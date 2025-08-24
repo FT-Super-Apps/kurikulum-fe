@@ -291,6 +291,8 @@ export default function Dashboard() {
           </p>
         </div>
 
+        <WorkflowProgress />
+
         <ConnectionStatus isConnected={!!isConnected} error={error} />
 
         <CurriculumWorkflow />

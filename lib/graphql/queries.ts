@@ -224,6 +224,7 @@ export const FIND_CPMK_BY_ID = gql`
       kode
       deskripsi
       level
+      level
     }
   }
 `;
@@ -233,6 +234,7 @@ export const FIND_CPMK_BY_MATA_KULIAH = gql`
     findCpmkByMataKuliah(mata_kuliah_id: $mata_kuliah_id) {
       kode
       deskripsi
+      level
       level
     }
   }

@@ -27,7 +27,7 @@ interface CpmkData {
 }
 
 interface CplData {
-  cpl: CPL[];
+  cpls: CPL[];
 }
 
 function CreateMappingDialog({ onSuccess }: { onSuccess: () => void }) {
@@ -104,7 +104,7 @@ function CreateMappingDialog({ onSuccess }: { onSuccess: () => void }) {
                 <SelectValue placeholder="Pilih CPL" />
               </SelectTrigger>
               <SelectContent>
-                {cplData?.cpl.map((cpl) => (
+                {cplData?.cpls.map((cpl) => (
                   <SelectItem key={cpl.id} value={cpl.id}>
                     <div className="flex flex-col items-start">
                       <span className="font-medium">{cpl.kode}</span>
@@ -131,10 +131,10 @@ function CreateMappingDialog({ onSuccess }: { onSuccess: () => void }) {
                 <ArrowRight className="h-4 w-4" />
                 <div className="flex-1">
                   <div className="font-medium text-sm">
-                    {cplData?.cpl.find(c => c.id === selectedCplId)?.kode}
+                    {cplData?.cpls.find(c => c.id === selectedCplId)?.kode}
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {cplData?.cpl.find(c => c.id === selectedCplId)?.domain}
+                    {cplData?.cpls.find(c => c.id === selectedCplId)?.domain}
                   </div>
                 </div>
               </div>
@@ -305,7 +305,7 @@ function MappingMatrix() {
         <TableHeader>
           <TableRow>
             <TableHead className="min-w-[200px]">CPMK</TableHead>
-            {cplData.cpl.map((cpl) => (
+            {cplData.cpls.map((cpl) => (
               <TableHead key={cpl.id} className="text-center min-w-[100px]">
                 <div className="text-xs">{cpl.kode}</div>
               </TableHead>
@@ -323,7 +323,7 @@ function MappingMatrix() {
                   </div>
                 </div>
               </TableCell>
-              {cplData.cpl.map((cpl) => (
+              {cplData.cpls.map((cpl) => (
                 <TableCell key={cpl.id} className="text-center">
                   {mappingMatrix[cpmk.id]?.[cpl.id] ? (
                     <div className="w-4 h-4 bg-green-500 rounded-full mx-auto"></div>

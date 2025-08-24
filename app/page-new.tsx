@@ -176,7 +176,7 @@ export default function Dashboard() {
   const stats = {
     fakultas: fakultasData?.fakultas?.length || 0,
     prodi: fakultasData?.fakultas?.reduce((acc: number, f: any) => acc + (f.prodi?.length || 0), 0) || 0,
-    cpl: cplData?.allCpl?.length || 0,
+    cpl: cplData?.cpls?.length || 0,
     mataKuliah: mataKuliahData?.allMataKuliah?.length || 0,
     cpmk: cpmkData?.allCpmk?.length || 0,
     profilLulusan: profilLulusanData?.allProfilLulusan?.length || 0,

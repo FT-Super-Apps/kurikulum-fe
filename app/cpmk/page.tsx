@@ -16,21 +16,17 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { GET_ALL_CPMK, GET_ALL_MATA_KULIAH } from '@/lib/graphql/queries';
 import { CREATE_CPMK, UPDATE_CPMK, REMOVE_CPMK } from '@/lib/graphql/mutations';
 import { CPMK, MataKuliah, CreateCpmkInput, UpdateCpmkInput, BloomLevel } from '@/lib/types';
+import { getBloomColor, bloomLevelInfo } from '@/lib/bloom-colors';
 import { Target, Plus, Edit, Trash2, BookOpen } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
-const bloomLevelOptions = [
-  { value: BloomLevel.MENGINGAT, label: 'Mengingat', color: 'bg-blue-100 text-blue-800' },
-  { value: BloomLevel.MEMAHAMI, label: 'Memahami', color: 'bg-green-100 text-green-800' },
-  { value: BloomLevel.MENERAPKAN, label: 'Menerapkan', color: 'bg-yellow-100 text-yellow-800' },
-  { value: BloomLevel.MENGANALISIS, label: 'Menganalisis', color: 'bg-orange-100 text-orange-800' },
-  { value: BloomLevel.MENGEVALUASI, label: 'Mengevaluasi', color: 'bg-red-100 text-red-800' },
-  { value: BloomLevel.MENCIPTA, label: 'Mencipta', color: 'bg-purple-100 text-purple-800' },
-];
-
-function getBloomLevelColor(level: BloomLevel) {
-  return bloomLevelOptions.find(option => option.value === level)?.color || 'bg-gray-100 text-gray-800';
-}
+const bloomLevelOptions = Object.entries(bloomLevelInfo).map(([value, info]) => ({
+  value: value as BloomLevel,
+  label: info.label,
+  description: info.description,
+  keywords: info.keywords,
+  color: getBloomColor(value as BloomLevel)
+}));
 
 interface CpmkData {
   cpmk: CPMK[];
@@ -40,7 +36,7 @@ interface MataKuliahData {
   mataKuliah: MataKuliah[];
 }
 
-function CreateCpmkDialog({ onSuccess }: { onSuccess: () => void }) {
+function CreateCpmkDialog({ onSuccess, disabled = false }: { onSuccess: () => void; disabled?: boolean }) {
   const [open, setOpen] = useState(false);
   const { register, handleSubmit, setValue, reset } = useForm<CreateCpmkInput>();
   const { data: mataKuliahData } = useQuery<MataKuliahData>(GET_ALL_MATA_KULIAH);
@@ -65,7 +61,7 @@ function CreateCpmkDialog({ onSuccess }: { onSuccess: () => void }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button disabled={disabled}>
           <Plus className="h-4 w-4 mr-2" />
           Tambah CPMK
         </Button>
@@ -259,10 +255,33 @@ function CpmkList() {
   }
 
   if (error) {
+    const isDbSchemaError = error.message.includes('bloom_level does not exist') || 
+                           error.message.includes('column Cpmk.bloom_level');
+    
     return (
       <Alert variant="destructive">
         <AlertDescription>
-          Error loading CPMK: {error.message}
+          {isDbSchemaError ? (
+            <div className="space-y-3">
+              <div className="font-semibold">🔧 Backend Configuration Issue</div>
+              <div>
+                CPMK feature tidak dapat digunakan karena ada masalah di backend GraphQL resolver.
+                Backend mencoba mengakses field 'bloom_level' yang tidak ada di database.
+              </div>
+              <div className="text-sm p-3 bg-muted rounded">
+                <strong>📋 Untuk Administrator Backend:</strong>
+                <br />1. Periksa CPMK GraphQL resolver
+                <br />2. Pastikan mapping field database sesuai dengan schema
+                <br />3. Field di database harus konsisten dengan resolver implementation
+                <br />4. Berdasarkan dokumentasi, gunakan field 'level' bukan 'bloom_level'
+              </div>
+              <div className="text-xs text-muted-foreground mt-2">
+                Error: {error.message}
+              </div>
+            </div>
+          ) : (
+            `Error loading CPMK: ${error.message}`
+          )}
         </AlertDescription>
       </Alert>
     );
@@ -305,7 +324,7 @@ function CpmkList() {
                         <Target className="h-4 w-4" />
                         <span className="font-medium">{cpmk.kode}</span>
                         {cpmk.level && (
-                          <Badge className={getBloomLevelColor(cpmk.level)}>
+                          <Badge className={getBloomColor(cpmk.level)}>
                             {bloomLevelOptions.find(opt => opt.value === cpmk.level)?.label}
                           </Badge>
                         )}
@@ -335,7 +354,8 @@ function CpmkList() {
 }
 
 export default function CpmkPage() {
-  const { refetch } = useQuery<CpmkData>(GET_ALL_CPMK);
+  const { data, loading, error, refetch } = useQuery<CpmkData>(GET_ALL_CPMK);
+  const hasError = !!error;
 
   return (
     <DashboardLayout>
@@ -347,7 +367,7 @@ export default function CpmkPage() {
               Manajemen Capaian Pembelajaran Mata Kuliah
             </p>
           </div>
-          <CreateCpmkDialog onSuccess={() => refetch()} />
+          <CreateCpmkDialog onSuccess={() => refetch()} disabled={hasError} />
         </div>
 
         <div className="space-y-4">
